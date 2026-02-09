@@ -6,7 +6,7 @@ import '../ai/ai_model.dart';
 class PredictionService {
   // Default ke localhost untuk development
   // Ganti dengan Railway URL untuk production
-  // static const String defaultBaseUrl = 'http://localhost:5000';
+  // static const String defaultBaseUrl = 'http://127.0.0.1:5000';
   static const String defaultBaseUrl = 'https://health-ai-backend-production-386e.up.railway.app';
   
   final String baseUrl;
@@ -64,8 +64,8 @@ class PredictionService {
 
   /// Predict dari raw data list
   Future<FitnessScores> predictFromRawData(List<List<double>> data) async {
-    if (data.length != 6) {
-      throw PredictionException('Data must have exactly 6 timesteps');
+    if (data.length != 6 && data.length != 7) {
+      throw PredictionException('Data must have 6 or 7 timesteps');
     }
     for (var i = 0; i < data.length; i++) {
       if (data[i].length != 4) {

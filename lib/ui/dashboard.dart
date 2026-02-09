@@ -52,6 +52,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final heartRates = _heartRateControllers.map((c) => double.tryParse(c.text) ?? 0).toList();
       final stress = _stressControllers.map((c) => double.tryParse(c.text) ?? 0).toList();
 
+      print('DEBUG: Manual Input Captured:');
+      for(int i=0; i<6; i++) {
+        print('  Day ${i+1}: Steps=${steps[i]}, Cal=${calories[i]}, HR=${heartRates[i]}, Stress=${stress[i]}');
+      }
+
       final sequence = HealthDataSequence.fromManualInput(
         steps: steps,
         calories: calories,
@@ -395,8 +400,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  '• Masukkan 6 data per jam dari smartwatch Anda\n'
-                  '• T1-T6 = Jam ke-1 sampai Jam ke-6\n'
+                  '• Masukkan 6 data per jam (6 jam terakhir)\n'
+                  '• J1-J6 = Jam ke-1 sampai Jam ke-6\n'
                   '• Data bisa diambil dari Huawei Health app',
                   style: TextStyle(color: Colors.white70, fontSize: 11),
                 ),
@@ -569,7 +574,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Fitness Scores',
+          'Readiness Score',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -631,7 +636,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Overall Fitness',
+                  'Overall Score',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,

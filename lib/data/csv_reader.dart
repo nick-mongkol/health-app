@@ -44,7 +44,7 @@ Future<List<List<double>>> readAndPreprocessCSVContent(String csvContent) async 
   }
 
   if (dataRows.length < 6) {
-    throw Exception("CSV harus memiliki minimal 6 baris data, ditemukan: ${dataRows.length}");
+    throw Exception("CSV harus memiliki minimal 6 baris data (6 Jam), ditemukan: ${dataRows.length} baris");
   }
 
   // Ambil 6 baris terakhir
