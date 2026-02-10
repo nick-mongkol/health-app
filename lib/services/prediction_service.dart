@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../ai/ai_model.dart';
 
 /// Service untuk berkomunikasi dengan Flask API backend
 class PredictionService {
-  // Default ke localhost untuk development
-  // Ganti dengan Railway URL untuk production
-  // static const String defaultBaseUrl = 'http://127.0.0.1:5000';
-  static const String defaultBaseUrl = 'https://health-ai-backend-production-386e.up.railway.app';
+  // Default ke localhost untuk development if .env invalid
+  static String defaultBaseUrl = dotenv.env['API_URL'] ?? 'http://127.0.0.1:5000';
   
   final String baseUrl;
   final http.Client _client;

@@ -48,4 +48,4 @@ api_server\heartrate_seconds_merged.csv
 api_server\model_multitask_lstm2.keras
 api_server\model_multitask_lstm.keras
 api_server\train_model_augmented.py
-api_server\*.csv
+api_server\*.csv.env
