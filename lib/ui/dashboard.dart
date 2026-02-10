@@ -188,7 +188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Smartwatch Health Monitor',
+                  'ReadiFit - Smartwatch Health Monitor',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -270,9 +270,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: _buildActionButton(
                 icon: Icons.upload_file,
-                label: 'Upload JSON',
-                subtitle: 'Huawei Export',
-                onTap: _predictFromJson,
+                label: 'Huawei Export (WIP)',
+                subtitle: 'Coming Soon',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur ini sedang dalam pengembangan')),
+                  );
+                },
+                isDisabled: true,
               ),
             ),
             const SizedBox(width: 12),
@@ -284,6 +289,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: _predictFromCsv,
               ),
             ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Divider bridging
+        const Row(
+          children: [
+            Expanded(child: Divider(color: Colors.white24)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Atau isi data secara manual',
+                style: TextStyle(color: Colors.white54, fontSize: 13),
+              ),
+            ),
+            Expanded(child: Divider(color: Colors.white24)),
           ],
         ),
         const SizedBox(height: 24),
@@ -299,6 +320,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String label,
     required String subtitle,
     required VoidCallback onTap,
+    bool isDisabled = false,
   }) {
     return Material(
       color: Colors.transparent,
@@ -308,7 +330,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            color: isDisabled ? Colors.white.withOpacity(0.05) : null,
+            gradient: isDisabled 
+              ? null 
+              : LinearGradient(
               colors: [
                 Colors.white.withValues(alpha: 0.1),
                 Colors.white.withValues(alpha: 0.05),
@@ -316,24 +341,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: Colors.white.withValues(alpha: isDisabled ? 0.05 : 0.1),
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, color: Colors.white, size: 32),
+              Icon(icon, color: isDisabled ? Colors.white24 : Colors.white, size: 32),
               const SizedBox(height: 8),
               Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: isDisabled ? Colors.white38 : Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Colors.white54,
+                style: TextStyle(
+                  color: isDisabled ? Colors.white24 : Colors.white54,
                   fontSize: 12,
                 ),
               ),
@@ -355,11 +380,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header dengan penjelasan
-          const Row(
+          Row(
             children: [
-              Icon(Icons.edit, color: Colors.white70, size: 20),
-              SizedBox(width: 8),
-              Expanded(
+              const Icon(Icons.edit, color: Colors.white70, size: 20),
+              const SizedBox(width: 8),
+              const Expanded(
                 child: Text(
                   'Input Manual Data Kesehatan',
                   style: TextStyle(
@@ -367,6 +392,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _showInputGuideDialog,
+                icon: const Icon(Icons.help_outline, color: Colors.white70, size: 18),
+                label: const Text(
+                  'Panduan Pengisian',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
               ),
             ],
@@ -402,7 +438,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text(
                   '• Masukkan 6 data per jam (6 jam terakhir)\n'
                   '• J1-J6 = Jam ke-1 sampai Jam ke-6\n'
-                  '• Data bisa diambil dari Huawei Health app',
+                  '• Data bisa diambil dari Huawei Health app (WIP)',
                   style: TextStyle(color: Colors.white70, fontSize: 11),
                 ),
               ],
@@ -594,7 +630,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 1.3,
+          childAspectRatio: 1.6, // Adjusted for shorter height
           children: [
             _buildScoreCard('Sleep', _scores!.sleepScore, Icons.bedtime, const Color(0xFF8b5cf6)),
             _buildScoreCard('HRV', _scores!.hrvScore, Icons.timeline, const Color(0xFF06b6d4)),
@@ -687,43 +723,161 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: color.withValues(alpha: 0.3),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: color, size: 24),
-              Text(
-                '${score.toInt()}%',
-                style: TextStyle(
-                  color: color,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(icon, color: color, size: 24),
+                  // Responsive text for Percentage
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '${score.toInt()}%',
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 24, // Larger base font
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // Responsive Title & Description
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16, // Larger base font
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Flexible(
+                      child: Text(
+                        _getScoreDescription(title, score),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 12, // More readable
+                          fontStyle: FontStyle.italic,
+                        ),
+                        maxLines: 2, // Allow wrap
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: score / 100,
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                  minHeight: 8, // Thicker bar
                 ),
               ),
             ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showInputGuideDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF16213e),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Panduan Nilai Kesehatan', style: TextStyle(color: Colors.white)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildGuideItem('Langkah (Steps)', 
+                'Kurang: < 5,000\nCukup: 5,000 - 10,000\nBagus: > 10,000'),
+              const SizedBox(height: 12),
+              _buildGuideItem('Kalori Harian', 
+                'Rendah: < 1,500\nNormal: 1,500 - 2,500\nTinggi: > 2,500'),
+              const SizedBox(height: 12),
+              _buildGuideItem('Detak Jantung (Resting)', 
+                'Atletis: < 60 bpm\nNormal: 60 - 100 bpm\nPerlu Perhatian: > 100 bpm'),
+              const SizedBox(height: 12),
+              _buildGuideItem('Tingkat Stres (0-100)', 
+                'Rileks: 0 - 30\nNormal: 30 - 60\nTinggi: 60 - 100'),
+            ],
           ),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: score / 100,
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-              minHeight: 6,
-            ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Tutup', style: TextStyle(color: Color(0xFF6366f1))),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildGuideItem(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.all(8),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(content, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4)),
+        ),
+      ],
+    );
+  }
+
+  String _getScoreDescription(String title, double score) {
+    if (title == 'Sleep') {
+      if (score < 50) return 'Kurang (Perbaiki pola)';
+      if (score < 70) return 'Cukup (Tingkatkan durasi)';
+      return 'Optimal (Pertahankan)';
+    }
+    if (title == 'HRV') {
+      if (score < 50) return 'Rendah (Indikasi stres)';
+      if (score < 70) return 'Seimbang (Cukup baik)';
+      return 'Tinggi (Kondisi prima)';
+    }
+    if (title == 'Resting HR') {
+      if (score < 50) return 'Kurang (Jantung bekerja keras)';
+      if (score < 70) return 'Normal (Sehat)';
+      return 'Sangat Baik (Atletis)';
+    }
+    if (title == 'Recovery') {
+      if (score < 50) return 'Belum Pulih (Istirahat)';
+      if (score < 70) return 'Cukup (Latihan ringan)';
+      return 'Pulih Penuh (Siap latihan)';
+    }
+    // Readiness / Default
+    if (score < 50) return 'Rendah (Fokus pemulihan)';
+    if (score < 70) return 'Sedang (Intensitas moderat)';
+    return 'Tinggi (Siap intensitas tinggi)';
   }
 }
